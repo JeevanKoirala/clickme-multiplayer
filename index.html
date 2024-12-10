@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click Race Multiplayer</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb);
+      background-size: 400% 400%;
+      animation: gradient-animation 10s ease infinite;
+      margin: 0;
+      padding: 20px;
+      color: #fff;
+    }
+
+    h1 {
+      color: #ffffff;
+      font-size: 2.5em;
+      text-shadow: 0 0 10px #fbc2eb, 0 0 20px #ff9a9e;
+      margin-bottom: 20px;
+    }
+
+    #game-area, #name-entry {
+      margin: 20px auto;
+      max-width: 400px;
+      padding: 20px;
+      border: 2px solid #fff;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      display: none;
+    }
+
+    #name-entry {
+      display: block;
+    }
+
+    input, button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    input {
+      width: 80%;
+    }
+
+    button {
+      background: linear-gradient(45deg, #00f260, #0575e6);
+      color: #fff;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 0 10px #00f260, 0 0 20px #0575e6;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #0575e6, 0 0 40px #00f260;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    #scoreboard {
+      margin-top: 20px;
+      font-size: 1.2em;
+      text-align: left;
+      color: #fff;
+    }
+
+    /* Background Animation */
+    @keyframes gradient-animation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Click Race Multiplayer</h1>
+
+  <!-- Name Entry Section -->
+  <div id="name-entry">
+    <p>Enter your name to start the game:</p>
+    <input type="text" id="player-name" placeholder="Your Name">
+    <button id="start-game">Start Game</button>
+  </div>
+
+  <!-- Game Area -->
+  <div id="game-area">
+    <button id="click-button">Click Me!</button>
+    <div id="score-board">Score: 0</div>
+    <div id="countdown">Time Left: 10s</div>
+    <div id="scoreboard">
+      <h3>Scoreboard</h3>
+      <ul id="score-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    // Variables
+    let score = 0;
+    let timeLeft = 10;
+    let gameActive = false;
+    const scoreboard = [];
+    
+    // DOM Elements
+    const nameEntry = document.getElementById('name-entry');
+    const gameArea = document.getElementById('game-area');
+    const playerNameInput = document.getElementById('player-name');
+    const startGameButton = document.getElementById('start-game');
+    const clickButton = document.getElementById('click-button');
+    const scoreBoard = document.getElementById('score-board');
+    const countdown = document.getElementById('countdown');
+    const scoreList = document.getElementById('score-list');
+
+    // Start Game
+    startGameButton.addEventListener('click', () => {
+      const playerName = playerNameInput.value.trim();
+      if (!playerName) {
+        alert("Please enter your name!");
+        return;
+      }
+
+      // Reset variables
+      score = 0;
+      timeLeft = 10;
+      gameActive = true;
+      scoreBoard.textContent = `Score: 0`;
+      countdown.textContent = `Time Left: 10s`;
+
+      // Hide name entry and show game area
+      nameEntry.style.display = 'none';
+      gameArea.style.display = 'block';
+
+      // Start the countdown
+      const timer = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          gameActive = false;
+          clickButton.disabled = true;
+
+          // Add player score to scoreboard
+          scoreboard.push({ name: playerName, score });
+          updateScoreboard();
+
+          clickButton.textContent = "Game Over!";
+          return;
+        }
+        timeLeft--;
+        countdown.textContent = `Time Left: ${timeLeft}s`;
+      }, 1000);
+    });
+
+    // Click Button Logic
+    clickButton.addEventListener('click', () => {
+      if (!gameActive) return;
+      score++;
+      scoreBoard.textContent = `Score: ${score}`;
+    });
+
+    // Update Scoreboard
+    function updateScoreboard() {
+      // Sort scores in descending order
+      scoreboard.sort((a, b) => b.score - a.score);
+
+      // Update the scoreboard UI
+      scoreList.innerHTML = scoreboard
+        .map((entry) => `<li>${entry.name}: ${entry.score}</li>`)
+        .join('');
+    }
+  </script>
+</body>
+</html>
